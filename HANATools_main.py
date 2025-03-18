@@ -3,8 +3,10 @@ import os
 import sys
 import copy
 import re
+import json
 
 from HANATools_MSD import MsdCipher
+from HANATools_MSD import MsdReader
 import HANATools_MGD
 
 ##something like cli???
@@ -13,7 +15,7 @@ def main(argc, argv):
         print(starttext)
         sys.exit(0)
 
-    if not sys.argv[1].startswith('-'):        
+    if not argv[1].startswith('-'):        
         print('请输入一个指令')
         sys.exit(1)
 
@@ -32,6 +34,7 @@ def main(argc, argv):
     input = None
     output_dir = None
     password = None
+    encoding = None
     for ca in CAs:
         cmd = ca[0]
         if cmd == 'h':
@@ -75,6 +78,13 @@ def main(argc, argv):
             else:
                 if password == None:
                     password = ca[1][0]
+        elif cmd == 'ec':
+            if len(ca[1]) < 1:
+                print(f'指令 -{cmd} 参数缺失')
+                sys.exit(1)
+            else:
+                if encoding == None:
+                    encoding = ca[1][0]
         else:
             print(f'未知指令：{cmd}')
             sys.exit(1)
@@ -113,6 +123,14 @@ def main(argc, argv):
         for iop in IOs:
             if iop[1].endswith(('.mgd', '.MGD')):
                 mgd2png(iop[0], output_dir)
+        sys.exit(0)
+    elif mode == '05' or mode == 'msdl':
+        for iop in IOs:
+            if iop[1].endswith(('.msd', '.MSD')):
+                if encoding == None:
+                    msd_decode_light(iop[0], output_dir)
+                else:
+                    msd_decode_light(iop[0], output_dir, encoding)
         sys.exit(0)
     else:
         print(f'未知模式{mode}')
@@ -208,6 +226,20 @@ def extract_fjsys(arc_path, output_dir, password=''):
 
     return 0
 
+def msd_decode_light(msd_path, output_dir, encoding='utf8'):
+    output_path = os.path.join(output_dir, msd_path[:-3] + 'json')
+    reader = MsdReader(msd_path, encoding)
+    reader.MsdReadLight()
+
+    optdir = output_path[:- len(re.split(rf'[/\\]', output_path)[-1])]
+    if not os.path.exists(optdir):
+        os.makedirs(optdir)
+
+    with open(output_path, 'w') as file:
+        file.write(json.JSONEncoder().encode(reader.codes))
+
+    return 0
+
 starttext = '老引擎花吻资源包处理工具\n帮助文档见-h'
 
 helptext = '''
@@ -216,6 +248,7 @@ helptext = '''
 -m  指定工具模式，可用参数如下
     01 或 ufj   fjsys文件拆包
     03 或 umg   MGD文件转png
+    05 或 msdl  MSD文件解码轻量版
 
 -i  指定输入文件，暂不支持多个参数
 
@@ -224,6 +257,8 @@ helptext = '''
 -od 指定输出目录，默认为opt
 
 -pw 指定主密钥，只会在fjsys文件拆包中用来解密MSD文件，通常为对应作品的完整名称，中间可能会有空格，请用引号括起来
+
+-ec 指定编码格式，只会用于MSD解码和编码(没做完)，默认为utf8
 '''
 
-
+main(len(sys.argv), sys.argv)

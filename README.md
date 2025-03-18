@@ -18,6 +18,11 @@ Convert MGD to png:
 python HANATools_main.py -m umg -i [intput_file] -od [output_directory]
 ```
 
+MSD decode(light):
+```
+python HANATools_main.py -m msdl -i [intput_file] -od [output_directory] -ec [encoding]
+```
+
 For help:
 ```
 python HANATools_main.py -h
