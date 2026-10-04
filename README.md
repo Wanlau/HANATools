@@ -1,4 +1,6 @@
-# HANATools
+# out of date
+
+## HANATools
 Tools for Sonohana???
 
 It seem there are some bugs when converting the mode-1 MGD to png. (such as: GS_EN_SN.MGD in HANA01)
