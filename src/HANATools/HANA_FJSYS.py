@@ -1,8 +1,10 @@
 import struct
 import os
+from io import BytesIO
 from typing import BinaryIO
 
 from .HANA_MSD import MsdCipher
+from .HANA_MGD import MgdConverter
 
 class FjsysExtracter:
     def __init__(self, stream: str | os.PathLike[str] | BinaryIO):
@@ -89,7 +91,11 @@ class FjsysExtracter:
                     data = cipher.decrypt(data)
             elif name.endswith((".mgd", ".MGD")):
                 if mgd_convert:
-                    pass
+                    name = name[:-4] + ".png"
+                    opt_path = os.path.join(opt_dir, name)
+                    converter = MgdConverter(BytesIO(data))
+                    converter.mgd_convert_opt(opt_path)
+                    continue
 
             with open(os.path.join(opt_dir, name), "wb") as file:
                 file.write(data)
