@@ -182,10 +182,10 @@ class MsdReader:
                 while  offset < data_size:
                     strbyte = data[offset]
                     offset += 1
-                    if strbyte == b"\x00":
+                    if strbyte == 0:
                         break
                     else:
-                        strbytes += strbyte
+                        strbytes.append(strbyte)
                 args.append({"flag": flag, "value": strbytes.decode(self.encoding)})
             ## `04 `曾出现在选项跳转相关指令`05 00 `的参数列表里，大小皆为0x20字节，具体意义不明，暂保留字节串
             elif flag == 4:

@@ -1,4 +1,8 @@
 */__pycache__/
 .vscode/
+msd_dialogues_data/
+opt/
+TTMP/
 *.pyc
 **/demo*
+**/test*.py
